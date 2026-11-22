@@ -21,7 +21,9 @@ export default function LoginPage() {
     });
     const data = await res.json();
     if (res.ok) {
-      router.push("/katalog");
+     router.push(
+  data.role === "mahasiswa" ? "/dashboard" : data.role === "pegawai" ? "/pegawai" : data.role === "admin" ? "/admin" : "/katalog"
+);
       router.refresh();
     } else {
       setError(data.error);
