@@ -1,6 +1,7 @@
 import pool from "@/lib/db";
 import AksiButtons from "./AksiButtons";
 import KembaliButton from "./KembaliButton";
+import LunasButton from "./LunasButton";
 
 export default async function PegawaiPage() {
   const antrean = await pool.query(
@@ -20,6 +21,15 @@ export default async function PegawaiPage() {
      JOIN books b ON b.id = l.book_id
      WHERE l.status = 'Sedang Dipinjam'
      ORDER BY l.jatuh_tempo`
+  );
+
+  const denda = await pool.query(
+    `SELECT l.id, u.nama, u.nim, b.judul, l.jumlah_denda
+     FROM loans l
+     JOIN users u ON u.id = l.user_id
+     JOIN books b ON b.id = l.book_id
+     WHERE l.status_denda = 'Tertunggak'
+     ORDER BY l.tanggal_kembali`
   );
 
   return (
@@ -55,6 +65,21 @@ export default async function PegawaiPage() {
               )}
             </div>
             <KembaliButton loanId={l.id} />
+          </div>
+        ))}
+      </div>
+
+      <h2 className="text-2xl font-bold mt-8 mb-4">Denda tertunggak</h2>
+      {denda.rows.length === 0 && <p className="text-sm text-gray-600">Tidak ada denda tertunggak.</p>}
+      <div className="space-y-3">
+        {denda.rows.map((l) => (
+          <div key={l.id} className="bg-white border rounded-lg p-4 flex items-center justify-between gap-4">
+            <div>
+              <p className="font-semibold">{l.judul}</p>
+              <p className="text-sm text-gray-600">{l.nama} ({l.nim})</p>
+              <p className="text-sm text-red-600">Denda: Rp {l.jumlah_denda.toLocaleString("id-ID")}</p>
+            </div>
+            <LunasButton loanId={l.id} />
           </div>
         ))}
       </div>
