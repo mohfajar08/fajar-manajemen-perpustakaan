@@ -1,9 +1,10 @@
 import pool from "@/lib/db";
 import AksiButtons from "./AksiButtons";
+import KembaliButton from "./KembaliButton";
 
 export default async function PegawaiPage() {
-  const result = await pool.query(
-    `SELECT l.id, l.tanggal_pengajuan, u.nama, u.nim, b.judul, b.stok_tersedia
+  const antrean = await pool.query(
+    `SELECT l.id, u.nama, u.nim, b.judul, b.stok_tersedia
      FROM loans l
      JOIN users u ON u.id = l.user_id
      JOIN books b ON b.id = l.book_id
@@ -11,14 +12,22 @@ export default async function PegawaiPage() {
      ORDER BY l.tanggal_pengajuan`
   );
 
+  const dipinjam = await pool.query(
+    `SELECT l.id, u.nama, u.nim, b.judul, l.jatuh_tempo,
+            GREATEST(CURRENT_DATE - l.jatuh_tempo, 0) AS hari_terlambat
+     FROM loans l
+     JOIN users u ON u.id = l.user_id
+     JOIN books b ON b.id = l.book_id
+     WHERE l.status = 'Sedang Dipinjam'
+     ORDER BY l.jatuh_tempo`
+  );
+
   return (
     <main className="max-w-4xl mx-auto p-6 text-gray-900">
       <h1 className="text-2xl font-bold mb-4">Antrean peminjaman</h1>
-
-      {result.rows.length === 0 && <p>Tidak ada pengajuan yang menunggu.</p>}
-
+      {antrean.rows.length === 0 && <p className="text-sm text-gray-600">Tidak ada pengajuan yang menunggu.</p>}
       <div className="space-y-3">
-        {result.rows.map((l) => (
+        {antrean.rows.map((l) => (
           <div key={l.id} className="bg-white border rounded-lg p-4 flex items-center justify-between gap-4">
             <div>
               <p className="font-semibold">{l.judul}</p>
@@ -27,6 +36,25 @@ export default async function PegawaiPage() {
               </p>
             </div>
             <AksiButtons loanId={l.id} />
+          </div>
+        ))}
+      </div>
+
+      <h2 className="text-2xl font-bold mt-8 mb-4">Sedang dipinjam</h2>
+      {dipinjam.rows.length === 0 && <p className="text-sm text-gray-600">Tidak ada buku yang sedang dipinjam.</p>}
+      <div className="space-y-3">
+        {dipinjam.rows.map((l) => (
+          <div key={l.id} className="bg-white border rounded-lg p-4 flex items-center justify-between gap-4">
+            <div>
+              <p className="font-semibold">{l.judul}</p>
+              <p className="text-sm text-gray-600">
+                {l.nama} ({l.nim}) · Jatuh tempo: {new Date(l.jatuh_tempo).toLocaleDateString("id-ID")}
+              </p>
+              {l.hari_terlambat > 0 && (
+                <p className="text-sm text-red-600">Terlambat {l.hari_terlambat} hari</p>
+              )}
+            </div>
+            <KembaliButton loanId={l.id} />
           </div>
         ))}
       </div>
