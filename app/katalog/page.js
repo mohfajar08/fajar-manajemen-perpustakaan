@@ -1,4 +1,5 @@
 import pool from "@/lib/db";
+import Link from "next/link";
 
 export default async function KatalogPage({ searchParams }) {
   const { q = "" } = await searchParams;
@@ -37,7 +38,7 @@ export default async function KatalogPage({ searchParams }) {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {books.map((b) => (
           <div key={b.id} className="bg-white border rounded-lg p-4">
-            <h2 className="font-semibold">{b.judul}</h2>
+           <Link href={`/buku/${b.id}`} className="font-semibold text-blue-700 hover:underline">{b.judul}</Link>
             <p className="text-sm text-gray-600">{b.penulis}</p>
             <p className="text-sm text-gray-600">{b.kategori}</p>
             <p className="text-sm mt-2">
