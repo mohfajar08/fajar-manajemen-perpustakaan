@@ -19,8 +19,11 @@ export default async function Navbar() {
           {session?.role === "mahasiswa" && (
             <Link href="/dashboard" className="hover:text-blue-600">Dashboard saya</Link>
           )}
-          {(session?.role === "pegawai" || session?.role === "admin") && (
-            <Link href="/pegawai" className="hover:text-blue-600">Antrean</Link>
+                   {(session?.role === "pegawai" || session?.role === "admin") && (
+            <>
+              <Link href="/pegawai" className="hover:text-blue-600">Antrean</Link>
+              <Link href="/pegawai/buku" className="hover:text-blue-600">Kelola buku</Link>
+            </>
           )}
           {session?.role === "admin" && (
             <Link href="/admin" className="hover:text-blue-600">Admin</Link>
