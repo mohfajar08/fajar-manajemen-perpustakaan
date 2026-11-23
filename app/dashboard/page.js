@@ -2,6 +2,7 @@ import pool from "@/lib/db";
 import Link from "next/link";
 import { cookies } from "next/headers";
 import { verifySession } from "@/lib/session";
+import UlasanForm from "./UlasanForm";
 
 export default async function DashboardPage() {
   const cookieStore = await cookies();
@@ -27,8 +28,11 @@ export default async function DashboardPage() {
 
   const riwayat = await pool.query(
     `SELECT l.id, l.status, l.tanggal_pinjam, l.tanggal_kembali, l.jumlah_denda,
-            l.status_denda, l.alasan_penolakan, b.judul
-     FROM loans l JOIN books b ON b.id = l.book_id
+            l.status_denda, l.alasan_penolakan, b.judul,
+            r.rating, r.komentar
+     FROM loans l
+     JOIN books b ON b.id = l.book_id
+     LEFT JOIN reviews r ON r.loan_id = l.id
      WHERE l.user_id = $1 AND l.status IN ('Selesai', 'Ditolak')
      ORDER BY l.tanggal_pengajuan DESC`,
     [session.id]
@@ -88,6 +92,13 @@ export default async function DashboardPage() {
               <p className="text-sm text-red-600">
                 Denda Rp {l.jumlah_denda.toLocaleString("id-ID")} ({l.status_denda})
               </p>
+            )}
+                        {l.status === "Selesai" && (
+              l.rating ? (
+                <p className="text-sm mt-1">Ulasan Anda: {l.rating}/5 {l.komentar && `· ${l.komentar}`}</p>
+              ) : (
+                <UlasanForm loanId={l.id} />
+              )
             )}
           </div>
         ))}
