@@ -14,6 +14,7 @@ export default async function Navbar() {
         <Link href="/" className="font-bold">Perpustakaan Kampus</Link>
 
         <div className="flex flex-wrap items-center gap-4">
+          <Link href="/" className="hover:text-blue-600">Beranda</Link>
           <Link href="/katalog" className="hover:text-blue-600">Katalog</Link>
 
           {session?.role === "mahasiswa" && (
