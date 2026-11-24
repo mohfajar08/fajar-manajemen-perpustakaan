@@ -46,6 +46,7 @@ export default function LoginPage() {
           Masuk
         </button>
         <a href="/register" className="block text-center text-sm text-blue-600">Belum punya akun? Daftar</a>
+                <a href="/katalog" className="block text-center text-sm text-gray-600 hover:underline">Lanjutkan sebagai tamu</a>
       </form>
     </main>
   );

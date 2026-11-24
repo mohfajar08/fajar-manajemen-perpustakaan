@@ -1,36 +1,68 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Sistem Manajemen Perpustakaan
 
-## Getting Started
+Aplikasi web manajemen perpustakaan kampus dengan peran Admin, Pegawai, Mahasiswa, dan Guest.
+Dibangun dengan Next.js (JavaScript, Tailwind CSS) dan PostgreSQL dengan raw SQL.
 
-First, run the development server:
+## Fitur
+- Register mahasiswa (email kampus `.ac.id`), login, dan logout dengan password di-hash (bcryptjs) dan sesi cookie
+- Proteksi halaman berdasarkan peran lewat `proxy.js` (pengganti `middleware` di Next.js 16)
+- Katalog buku: pencarian, filter kategori, dan pengurutan
+- Detail buku dengan ulasan dan rating
+- Pengajuan peminjaman, persetujuan atau penolakan pegawai, dan pengembalian (stok diperbarui lewat transaksi SQL)
+- Denda keterlambatan otomatis, pencatatan lunas, dan blokir pinjam jika ada denda tertunggak
+- Perpanjangan masa pinjam dengan persetujuan pegawai
+- CRUD buku oleh pegawai
+- Dashboard mahasiswa, dan homepage dengan 5 buku terpopuler
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Cara menjalankan
+
+### 1. Prasyarat
+Node.js 20 atau lebih baru dan PostgreSQL.
+
+### 2. Siapkan database
+Buat database kosong bernama `library_db`, lalu jalankan:
+
+```
+psql -U postgres -d library_db -f schema.sql
+psql -U postgres -d library_db -f seed.sql
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 3. Konfigurasi
+Buat file `.env.local` di folder utama:
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+```
+DATABASE_URL=postgresql://postgres:PASSWORD_ANDA@localhost:5432/library_db
+SESSION_SECRET=isi_dengan_teks_acak_panjang
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Kunci acak dapat dibuat dengan:
 
-## Learn More
+```
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
 
-To learn more about Next.js, take a look at the following resources:
+### 4. Jalankan aplikasi
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+npm install
+npm run dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Buka http://localhost:3000
 
-## Deploy on Vercel
+## Akun uji
+Akun dibuat lewat halaman `/register` (khusus mahasiswa), karena password disimpan sebagai hash.
+Untuk membuat akun pegawai atau admin, daftar dulu lewat `/register`, lalu ubah perannya:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+psql -U postgres -d library_db -c "UPDATE users SET role = 'pegawai' WHERE email = 'EMAIL_AKUN';"
+psql -U postgres -d library_db -c "UPDATE users SET role = 'admin' WHERE email = 'EMAIL_AKUN';"
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Setelah peran diubah, login ulang.
+
+## Struktur singkat
+- `app/` halaman dan route handler (App Router)
+- `lib/db.js` koneksi PostgreSQL, `lib/session.js` pembuatan dan verifikasi sesi
+- `proxy.js` proteksi halaman berdasarkan peran
+- `schema.sql` dan `seed.sql` skema dan data awal database
