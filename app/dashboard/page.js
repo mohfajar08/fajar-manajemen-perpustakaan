@@ -3,6 +3,7 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { verifySession } from "@/lib/session";
 import UlasanForm from "./UlasanForm";
+import PerpanjangButton from "./PerpanjangButton";
 
 export default async function DashboardPage() {
   const cookieStore = await cookies();
@@ -61,8 +62,11 @@ export default async function DashboardPage() {
           <div key={l.id} className="bg-white border rounded-lg p-4">
             <p className="font-semibold">{l.judul}</p>
             <p className="text-sm text-gray-600">Status: {l.status}</p>
-            {l.status === "Sedang Dipinjam" && (
-              <p className="text-sm text-gray-600">Jatuh tempo: {tgl(l.jatuh_tempo)}</p>
+           {l.status === "Sedang Dipinjam" && (
+              <>
+                <p className="text-sm text-gray-600">Jatuh tempo: {tgl(l.jatuh_tempo)}</p>
+                {l.hari_terlambat === 0 && <PerpanjangButton loanId={l.id} />}
+              </>
             )}
             {l.hari_terlambat > 0 && l.status === "Sedang Dipinjam" && (
               <p className="text-sm text-red-600">
