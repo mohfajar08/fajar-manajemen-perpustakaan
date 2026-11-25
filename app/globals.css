@@ -1,21 +1,123 @@
 @import "tailwindcss";
 
+@theme {
+  --color-blue-500: #3f6ea8;
+  --color-blue-600: #1d3f72;
+  --color-blue-700: #142f58;
+  --color-gray-100: #e8eef6;
+  --radius-lg: 0.875rem;
+  --font-serif: Georgia, "Times New Roman", serif;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --kertas: #f3f6fa;
+  --tinta: #1b2433;
+  --utama: #1d3f72;
+  --garis: #d9e0ea;
+  --aksen: #5b8bc4;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+@layer base {
+  *,
+  ::after,
+  ::before {
+    border-color: var(--garis);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: var(--kertas);
+    color: var(--tinta);
+    font-family: "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-serif);
+    color: var(--utama);
+    letter-spacing: -0.01em;
+  }
+
+  ::selection {
+    background: #cfe0f5;
+    color: var(--tinta);
+  }
+
+  button,
+  [type="submit"] {
+    cursor: pointer;
+    transition: background-color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  input,
+  select,
+  textarea {
+    background-color: #fff;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  input:focus,
+  select:focus,
+  textarea:focus {
+    outline: none;
+    border-color: var(--utama);
+    box-shadow: 0 0 0 3px rgb(29 63 114 / 0.16);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--aksen);
+    outline-offset: 2px;
+  }
 }
 
+@layer components {
+  nav {
+    border-top: 3px solid var(--aksen);
+    box-shadow: 0 1px 0 var(--garis);
+  }
 
+  .bg-white.border {
+    box-shadow: 0 1px 2px rgb(27 36 51 / 0.04),
+      0 12px 28px -18px rgb(29 63 114 / 0.3);
+  }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  .bg-blue-600 {
+    box-shadow: 0 1px 2px rgb(20 47 88 / 0.3);
+  }
+
+  table thead tr {
+    background: #e8eef6;
+  }
+
+  table th {
+    color: var(--utama);
+    font-weight: 600;
+  }
+}
+
+section.text-center {
+  border-bottom: 1px solid var(--garis);
+  margin-bottom: 2rem;
+}
+
+section.text-center h1 {
+  font-size: clamp(2rem, 5vw, 3rem);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
 }

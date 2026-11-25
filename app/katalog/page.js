@@ -1,5 +1,6 @@
 import pool from "@/lib/db";
 import Link from "next/link";
+import BukuCover from "../components/BukuCover";
 
 const URUTAN = {
   judul: "b.judul ASC",
@@ -14,7 +15,8 @@ export default async function KatalogPage({ searchParams }) {
   const daftarKategori = await pool.query("SELECT id, nama FROM categories ORDER BY nama");
 
   const result = await pool.query(
-    `SELECT b.id, b.judul, b.penulis, b.tahun_terbit, c.nama AS kategori, b.stok_tersedia,
+    `SELECT b.id, b.judul, b.penulis, b.tahun_terbit, b.cover_url,
+            c.nama AS kategori, b.stok_tersedia,
             ROUND(AVG(r.rating), 1) AS rating
      FROM books b
      JOIN categories c ON c.id = b.category_id
@@ -60,15 +62,20 @@ export default async function KatalogPage({ searchParams }) {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {books.map((b) => (
-          <div key={b.id} className="bg-white border rounded-lg p-4">
-            <Link href={`/buku/${b.id}`} className="font-semibold text-blue-700 hover:underline">
-              {b.judul}
+          <div key={b.id} className="bg-white border rounded-lg p-4 flex gap-4">
+            <Link href={`/buku/${b.id}`} className="shrink-0">
+              <BukuCover id={b.id} judul={b.judul} coverUrl={b.cover_url} className="w-24 h-36" />
             </Link>
-            <p className="text-sm text-gray-600">{b.penulis}</p>
-            <p className="text-sm text-gray-600">{b.kategori} · {b.tahun_terbit}</p>
-            <p className="text-sm mt-2">
-              Stok: {b.stok_tersedia} · Rating: {b.rating ?? "-"}
-            </p>
+            <div className="min-w-0">
+              <Link href={`/buku/${b.id}`} className="font-semibold text-blue-700 hover:underline">
+                {b.judul}
+              </Link>
+              <p className="text-sm text-gray-600">{b.penulis}</p>
+              <p className="text-sm text-gray-600">{b.kategori} · {b.tahun_terbit}</p>
+              <p className="text-sm mt-2">
+                Stok: {b.stok_tersedia} · Rating: {b.rating ?? "-"}
+              </p>
+            </div>
           </div>
         ))}
       </div>
